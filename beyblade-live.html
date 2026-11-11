@@ -3,7 +3,16 @@
 </style></head><body><header><small>BEYBLADE X TOURNAMENT</small><h1>賽事即時查詢</h1><p>淘汰賽對戰樹狀圖・決賽積分排行榜</p></header><main><div class="status"><b id="state">準備連線</b> <span id="time"></span><div id="error"></div></div><section class="panel"><h2>C 頁面｜淘汰賽樹狀圖</h2><p class="sub">向左右滑動，可查看所有對戰輪次與晉級結果</p><div class="scroll"><div class="bracket" id="bracket"><div class="empty">等待賽事資料…</div></div></div></section><section class="panel"><h2>🏆 D 頁面｜決賽積分排行榜</h2><p class="sub">勝場 3 積分，依積分、勝場、得失分差、總得分排序</p><div id="leaderboard" class="empty">等待決賽資料…</div></section><footer>本頁僅供查詢，不提供修改、計分或清除功能。</footer></main><script>
 // 管理員部署前：請把管理後台「雲端設定」中的 Firebase JSON 貼在下方。
 // Firebase 網頁設定不是密碼；真正的資料安全由 Firebase Database Rules 控制。
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  "apiKey": "AIzaSyC--ACJtcLYPDukAiUFb5Ew1KLacynti7g",
+  "authDomain": "fir-config-276df.firebaseapp.com",
+  "projectId": "fir-config-276df",
+  "storageBucket": "fir-config-276df.appspot.com",
+  "messagingSenderId": "668262487593",
+  "appId": "1:668262487593:web:4469c185f7c625cde12e38",
+  "measurementId": "G-S32FYB9P9J",
+  "databaseURL": "https://fir-config-276df-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
 // 例如：const FIREBASE_CONFIG = {"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"...","appId":"..."};
 const DATA_PATH = 'beybladeTournamentData';
 const $=id=>document.getElementById(id);
