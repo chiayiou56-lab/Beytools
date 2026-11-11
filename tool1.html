@@ -225,24 +225,11 @@
                     </div>
                 </div>
 
-                <!-- Size Selection Buttons (8, 12, 16, 24) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <button onclick="setTournamentSize(8)" id="sizeBtn8" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
-                        <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">8 人賽制</div>
-                        <div class="text-[11px] text-slate-400 mt-1">取前2名決賽</div>
-                    </button>
-                    <button onclick="setTournamentSize(12)" id="sizeBtn12" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
-                        <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">12 人賽制</div>
-                        <div class="text-[11px] text-slate-400 mt-1">取前3名決賽</div>
-                    </button>
-                    <button onclick="setTournamentSize(16)" id="sizeBtn16" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
-                        <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">16 人賽制</div>
-                        <div class="text-[11px] text-slate-400 mt-1">取前4強循環</div>
-                    </button>
-                    <button onclick="setTournamentSize(24)" id="sizeBtn24" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
-                        <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">24 人賽制</div>
-                        <div class="text-[11px] text-slate-400 mt-1">取前3強循環</div>
-                    </button>
+                <!-- 賽制選擇 -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <button onclick="setTournamentSize(16)" id="sizeBtn16" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group"><div class="font-orbitron font-black text-xl text-white">16 人賽制</div><div class="text-[11px] text-slate-400 mt-1">取前4強循環</div></button>
+                    <button onclick="setTournamentSize(24)" id="sizeBtn24" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group"><div class="font-orbitron font-black text-xl text-white">24 人賽制</div><div class="text-[11px] text-slate-400 mt-1">取前3強循環</div></button>
+                    <div id="customSizeCard" class="p-3 rounded-xl border border-bey-border bg-bey-dark space-y-2"><label for="customTournamentSize" class="block font-bold text-sm text-bey-gold">自訂人數賽制</label><div class="flex gap-2"><input id="customTournamentSize" type="number" min="2" max="128" value="16" inputmode="numeric" class="w-full min-w-0 bg-bey-card border border-slate-600 rounded-lg px-2 py-2 text-white text-sm" aria-label="自訂參賽人數"><button onclick="applyCustomTournamentSize()" class="shrink-0 bg-bey-accent text-bey-dark font-bold rounded-lg px-3 text-xs">套用</button></div><p class="text-[10px] text-slate-400">2～128 人；每輪僅補足偶數籤位，直到決賽名額</p></div>
                 </div>
 
                 <!-- Action & Status Bar -->
@@ -283,6 +270,12 @@
                     </div>
                 </div>
 
+                <div class="bg-bey-dark/70 border border-bey-border rounded-xl p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3"><div class="font-bold text-sm text-bey-gold"><i class="fa-solid fa-right-left mr-2"></i>手動對調選手</div><button id="toggleTreeSwapBtn" onclick="toggleTreeSwapMode()" class="bg-bey-accent text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">開啟對調模式</button></div>
+                    <p id="treeSwapHint" class="text-xs text-slate-400">開啟後，直接點選第一輪樹狀圖上的兩位選手，再按確認對調。可選輪空籤位。</p>
+                    <div id="treeSwapActions" class="hidden flex flex-wrap gap-2 items-center"><span id="treeSwapSelection" class="text-xs text-bey-gold flex-1">尚未選取選手</span><button onclick="confirmTreeSwap()" class="bg-amber-400 text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">確認對調</button><button onclick="clearTreeSwapSelection()" class="bg-slate-700 text-white rounded-lg px-4 py-2 text-xs font-bold">清除選取</button></div>
+                </div>
+
                 <!-- Horizontal Scrollable Bracket Area -->
                 <div class="overflow-x-auto pb-4 pt-2">
                     <div id="bracketTreeContainer" class="flex items-center space-x-8 min-w-max px-2">
@@ -298,18 +291,18 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-bey-border pb-4 gap-3">
                     <div>
                         <h2 class="font-orbitron font-bold text-base text-bey-gold flex items-center space-x-2">
-                            <i class="fa-solid fa-trophy"></i><span>決賽循環賽區 (積分排行與頒獎台)</span>
+                            <i class="fa-solid fa-trophy"></i><span>決賽對戰區 (冠亞季殿)</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">依賽制自動或手動選取名額，選手各打過一次，最後比積分與得失分。</p>
+                        <p class="text-xs text-slate-400 mt-1">4 人決賽隨機配對，兩場準決賽勝者爭冠亞、敗者爭季殿；2 人及 3 人模式維持原規則。</p>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="roundRobinTypeSelect" class="bg-bey-dark border border-bey-border rounded-xl px-3 py-2 text-xs font-bold text-bey-gold focus:outline-none focus:border-bey-accent">
                             <option value="2">2人決賽 (冠亞賽)</option>
                             <option value="3">3人循環賽</option>
-                            <option value="4" selected>4人循環賽</option>
+                            <option value="4" selected>4人淘汰排名賽 (冠亞季殿)</option>
                         </select>
                         <button onclick="generateRoundRobinFromC()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-bey-dark font-bold text-xs rounded-xl shadow-md transition-all">
-                            讀取 C 頁面獲勝者開啟循環賽
+                            讀取 C 頁面晉級者建立決賽
                         </button>
                         <button onclick="clearRoundRobinData()" class="px-3 py-2 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-400 font-bold text-xs rounded-xl transition-all">
                             清除
@@ -320,18 +313,18 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Round Robin Matches -->
                     <div class="lg:col-span-2 space-y-4">
-                        <h3 class="font-orbitron font-bold text-xs text-slate-300">循環對戰清單</h3>
+                        <h3 class="font-orbitron font-bold text-xs text-slate-300">決賽對戰清單</h3>
                         <div id="rrMatchesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="col-span-full py-12 text-center text-slate-500 bg-bey-dark/60 rounded-xl border border-bey-border">
                                 <i class="fa-solid fa-trophy text-3xl mb-2 block"></i>
-                                尚未開啟循環賽，請點擊上方【根據 C 頁面開啟循環賽】
+                                尚未建立決賽，請點擊上方讀取 C 頁面晉級者
                             </div>
                         </div>
                     </div>
 
                     <!-- Right: Leaderboard & Podium -->
                     <div class="space-y-4">
-                        <h3 class="font-orbitron font-bold text-xs text-slate-300">當前積分排行榜與領獎台</h3>
+                        <h3 class="font-orbitron font-bold text-xs text-slate-300">決賽排名與領獎台</h3>
                         <div id="rrLeaderboard" class="bg-bey-dark border border-bey-border rounded-xl p-4 space-y-3">
                             <p class="text-xs text-slate-500 text-center py-4">循環賽名單尚未產生</p>
                         </div>
@@ -457,19 +450,19 @@
                     <div id="modalP1Name" class="font-bold text-sm sm:text-base text-white truncate">選手 A</div>
                     <div id="modalP1Score" class="orbitron font-black text-4xl sm:text-5xl text-bey-gold">0</div>
                     <div class="grid grid-cols-3 gap-1.5 pt-2">
-                        <button onclick="addModalScore(1, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
-                        <button onclick="addModalScore(1, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
-                        <button onclick="addModalScore(1, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
+                        <button onclick="displayCScore(1, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
+                        <button onclick="displayCScore(1, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
+                        <button onclick="displayCScore(1, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
                     </div>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="addModalScore(1, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
-                        <button onclick="addModalFault(1)" id="modalP1FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
+                        <button onclick="displayCScore(1, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
+                        <button onclick="displayCFault(1)" id="modalP1FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
                     </div>
-                    <button onclick="confirmModalWinner(1)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P1 勝出</button>
+                    <button onclick="displayCWinner(1)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P1 勝出</button>
                 </div>
 
                 <!-- VS -->
-                <div class="col-span-1 font-orbitron font-black text-slate-500 text-lg sm:text-xl">VS</div>
+                <div class="col-span-1 flex flex-col items-center gap-2"><button onclick="swapModalSides()" class="bg-slate-700 border border-bey-accent/40 text-bey-accent rounded-lg px-2 py-2 text-[11px] font-bold" title="左右選手交換位置"><i class="fa-solid fa-right-left"></i><span class="block">交換</span></button><span class="font-orbitron font-black text-slate-400 text-lg">VS</span></div>
 
                 <!-- Player 2 -->
                 <div class="col-span-2 space-y-3 bg-bey-dark/70 border border-bey-border p-4 sm:p-5 rounded-2xl">
@@ -477,15 +470,15 @@
                     <div id="modalP2Name" class="font-bold text-sm sm:text-base text-white truncate">選手 B</div>
                     <div id="modalP2Score" class="orbitron font-black text-4xl sm:text-5xl text-bey-gold">0</div>
                     <div class="grid grid-cols-3 gap-1.5 pt-2">
-                        <button onclick="addModalScore(2, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
-                        <button onclick="addModalScore(2, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
-                        <button onclick="addModalScore(2, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
+                        <button onclick="displayCScore(2, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
+                        <button onclick="displayCScore(2, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
+                        <button onclick="displayCScore(2, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
                     </div>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="addModalScore(2, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
-                        <button onclick="addModalFault(2)" id="modalP2FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
+                        <button onclick="displayCScore(2, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
+                        <button onclick="displayCFault(2)" id="modalP2FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
                     </div>
-                    <button onclick="confirmModalWinner(2)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P2 勝出</button>
+                    <button onclick="displayCWinner(2)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P2 勝出</button>
                 </div>
             </div>
 
@@ -509,33 +502,33 @@
                     <div id="modalDP1Name" class="font-bold text-sm sm:text-base text-white truncate">選手 A</div>
                     <div id="modalDP1Score" class="orbitron font-black text-4xl sm:text-5xl text-bey-gold">0</div>
                     <div class="grid grid-cols-3 gap-1.5 pt-2">
-                        <button onclick="addDModalScore(1, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
-                        <button onclick="addDModalScore(1, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
-                        <button onclick="addDModalScore(1, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
+                        <button onclick="displayDScore(1, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
+                        <button onclick="displayDScore(1, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
+                        <button onclick="displayDScore(1, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
                     </div>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="addDModalScore(1, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
-                        <button onclick="addDModalFault(1)" id="modalDP1FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
+                        <button onclick="displayDScore(1, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
+                        <button onclick="displayDFault(1)" id="modalDP1FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
                     </div>
-                    <button onclick="confirmDModalWinner(1)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P1 勝出</button>
+                    <button onclick="displayDWinner(1)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P1 勝出</button>
                 </div>
 
-                <div class="col-span-1 font-orbitron font-black text-slate-500 text-lg sm:text-xl">VS</div>
+                <div class="col-span-1 flex flex-col items-center gap-2"><button onclick="swapDModalSides()" class="bg-slate-700 border border-bey-accent/40 text-bey-accent rounded-lg px-2 py-2 text-[11px] font-bold" title="左右選手交換位置"><i class="fa-solid fa-right-left"></i><span class="block">交換</span></button><span class="font-orbitron font-black text-slate-400 text-lg">VS</span></div>
 
                 <!-- Player 2 -->
                 <div class="col-span-2 space-y-3 bg-bey-dark/70 border border-bey-border p-4 sm:p-5 rounded-2xl">
                     <div id="modalDP2Name" class="font-bold text-sm sm:text-base text-white truncate">選手 B</div>
                     <div id="modalDP2Score" class="orbitron font-black text-4xl sm:text-5xl text-bey-gold">0</div>
                     <div class="grid grid-cols-3 gap-1.5 pt-2">
-                        <button onclick="addDModalScore(2, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
-                        <button onclick="addDModalScore(2, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
-                        <button onclick="addDModalScore(2, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
+                        <button onclick="displayDScore(2, 1)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+1分</button>
+                        <button onclick="displayDScore(2, 2)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+2分</button>
+                        <button onclick="displayDScore(2, 3)" class="py-2 bg-bey-accent/20 text-bey-accent hover:bg-bey-accent/30 text-xs sm:text-sm font-bold rounded-xl transition-all">+3分</button>
                     </div>
                     <div class="grid grid-cols-2 gap-1.5">
-                        <button onclick="addDModalScore(2, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
-                        <button onclick="addDModalFault(2)" id="modalDP2FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
+                        <button onclick="displayDScore(2, -1)" class="py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs font-bold rounded-xl transition-all">-1分</button>
+                        <button onclick="displayDFault(2)" id="modalDP2FaultBtn" class="py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 text-xs font-bold rounded-xl transition-all">失誤記次 (0/2)</button>
                     </div>
-                    <button onclick="confirmDModalWinner(2)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P2 勝出</button>
+                    <button onclick="displayDWinner(2)" class="w-full py-2.5 bg-bey-gold hover:bg-yellow-400 text-bey-dark font-bold text-xs sm:text-sm rounded-xl shadow-lg mt-2 transition-all">判定 P2 勝出</button>
                 </div>
             </div>
 
@@ -555,6 +548,8 @@
         let top3Data = { players: [], matches: [] };
         let activeModalRef = { rIdx: null, mIdx: null };
         let activeDModalIdx = null;
+        let cSidesSwapped = false;
+        let dSidesSwapped = false;
         let activeFaults = { p1: 0, p2: 0 };
 
         let isCloudConnected = false;
@@ -921,8 +916,14 @@
             showToast(`已切換賽制規模為 ${size} 人`);
         }
 
+        function applyCustomTournamentSize() {
+            const n = Number(document.getElementById('customTournamentSize').value);
+            if (!Number.isInteger(n) || n < 2 || n > 128) { showToast('請輸入 2～128 的整數人數'); return; }
+            setTournamentSize(n);
+        }
+
         function updatePageBUI() {
-            [8, 12, 16, 24].forEach(sz => {
+            [16, 24].forEach(sz => {
                 const btn = document.getElementById(`sizeBtn${sz}`);
                 if (btn) {
                     if (sz === tournamentSize) {
@@ -932,6 +933,10 @@
                     }
                 }
             });
+            const customCard = document.getElementById('customSizeCard');
+            if (customCard) customCard.classList.toggle('border-bey-gold', ![16,24].includes(tournamentSize));
+            const customInput = document.getElementById('customTournamentSize');
+            if (customInput && document.activeElement !== customInput) customInput.value = tournamentSize;
             const szLbl = document.getElementById('currentSizeLabel');
             const cntLbl = document.getElementById('activePlayerCountLabel');
             if (szLbl) szLbl.innerText = `${tournamentSize} 人賽制`;
@@ -949,8 +954,8 @@
             if (pool.length === 0) { showToast('請先於 A 頁面新增選手'); return; }
 
             const shuffled = [...pool].sort(() => Math.random() - 0.5);
-            const totalSlots = tournamentSize;
-            const actualPlayerCount = Math.min(shuffled.length, totalSlots);
+            const totalSlots = tournamentSize % 2 === 0 ? tournamentSize : tournamentSize + 1;
+            const actualPlayerCount = Math.min(shuffled.length, tournamentSize);
             const byeCount = totalSlots - actualPlayerCount;
 
             let items = [];
@@ -1009,85 +1014,122 @@
             });
         }
 
+
+        let treeSwapMode = false;
+        let treeSwapSelected = [];
+        function toggleTreeSwapMode() {
+            treeSwapMode = !treeSwapMode;
+            treeSwapSelected = [];
+            refreshTreeSwapUI();
+            renderBracketTree();
+        }
+        function clearTreeSwapSelection() { treeSwapSelected = []; refreshTreeSwapUI(); renderBracketTree(); }
+        function refreshTreeSwapUI() {
+            const btn = document.getElementById('toggleTreeSwapBtn');
+            if (btn) btn.textContent = treeSwapMode ? '關閉對調模式' : '開啟對調模式';
+            document.getElementById('treeSwapActions')?.classList.toggle('hidden', !treeSwapMode);
+            const selected = treeSwapSelected.map(i => `#${i+1} ${assignedSeeds[i]?.player?.name || '輪空'}`);
+            const hint = document.getElementById('treeSwapSelection');
+            if (hint) hint.textContent = selected.length ? selected.join(' ⇄ ') : '請在第一輪點選兩位選手';
+        }
+        function chooseTreeSwapSeed(index) {
+            if (!treeSwapMode || !assignedSeeds[index]) return;
+            if (treeSwapSelected.includes(index)) treeSwapSelected = treeSwapSelected.filter(i => i !== index);
+            else if (treeSwapSelected.length >= 2) treeSwapSelected = [index];
+            else treeSwapSelected.push(index);
+            refreshTreeSwapUI(); renderBracketTree();
+        }
+        function confirmTreeSwap() {
+            if (treeSwapSelected.length !== 2) { showToast('請先點選兩位不同選手'); return; }
+            const [i,j] = treeSwapSelected;
+            if (!confirm(`確定交換 #${i+1} ${assignedSeeds[i].player.name} 與 #${j+1} ${assignedSeeds[j].player.name}？\n淘汰賽比分及晉級紀錄將重新初始化。`)) return;
+            const a=assignedSeeds[i], b=assignedSeeds[j];
+            [a.player,b.player]=[b.player,a.player];
+            [a.isBye,b.isBye]=[b.isBye,a.isBye];
+            treeSwapSelected=[];
+            generateBracketFromDraw(); renderAssignedSeeds(); refreshTreeSwapUI();
+            showToast('選手對調完成，已同步賽程');
+        }
+        function cActualSide(side) { return cSidesSwapped ? 3-side : side; }
+        function dActualSide(side) { return dSidesSwapped ? 3-side : side; }
+        function renderCSides() {
+            const {rIdx,mIdx} = activeModalRef;
+            const m = bracketData.rounds?.[rIdx]?.[mIdx]; if (!m) return;
+            [1,2].forEach(display => {
+                const actual = cActualSide(display);
+                document.getElementById(`modalP${display}Name`).textContent = m[`p${actual}`]?.name || 'TBD';
+                document.getElementById(`modalP${display}Seed`).textContent = `#${m[`seed${actual}`] || '00'}`;
+                document.getElementById(`modalP${display}Score`).textContent = m[`score${actual}`] || 0;
+                document.getElementById(`modalP${display}FaultBtn`).textContent = `失誤記次 (${activeFaults[`p${actual}`]}/2)`;
+            });
+        }
+        function renderDSides() {
+            const m = top3Data.matches?.[activeDModalIdx]; if (!m) return;
+            [1,2].forEach(display => {
+                const actual = dActualSide(display);
+                document.getElementById(`modalDP${display}Name`).textContent = m[`p${actual}`]?.name || 'TBD';
+                document.getElementById(`modalDP${display}Score`).textContent = m[`s${actual}`] || 0;
+                document.getElementById(`modalDP${display}FaultBtn`).textContent = `失誤記次 (${activeFaults[`p${actual}`]}/2)`;
+            });
+        }
+        function swapModalSides() { cSidesSwapped = !cSidesSwapped; renderCSides(); }
+        function swapDModalSides() { dSidesSwapped = !dSidesSwapped; renderDSides(); }
+        function displayCScore(side, val) { addModalScore(cActualSide(side), val); renderCSides(); }
+        function displayCFault(side) { addModalFault(cActualSide(side)); renderCSides(); }
+        function displayCWinner(side) { confirmModalWinner(cActualSide(side)); }
+        function displayDScore(side, val) { addDModalScore(dActualSide(side), val); renderDSides(); }
+        function displayDFault(side) { addDModalFault(dActualSide(side)); renderDSides(); }
+        function displayDWinner(side) { confirmDModalWinner(dActualSide(side)); }
+
         function confirmBracketReset() {
             if (!confirm("確定要重新初始化對戰樹嗎？\n目前 C 頁面的對戰比分、勝負與晉級紀錄將被清除，且會同步至雲端。")) return;
             generateBracketFromDraw();
         }
 
         function generateBracketFromDraw() {
-            if (assignedSeeds.length === 0) {
-                if (players.length === 0) { showToast('請先新增選手'); return; }
-                executeShuffleAndAssign();
+            if (!assignedSeeds.length) {
+                if (!players.length) { showToast('請先新增選手'); return; }
+                executeShuffleAndAssign(); return;
             }
-
+            const target = tournamentSize === 24 ? 3 : Math.min(4, Math.max(2, tournamentSize));
             const rounds = [];
-            let round1Matches = [];
-            for (let i = 0; i < assignedSeeds.length; i += 2) {
-                const s1 = assignedSeeds[i];
-                const s2 = assignedSeeds[i + 1] || { seedNum: i + 2, player: { id: 'BYE_END', name: '輪空 (BYE)' }, isBye: true };
-
-                let winner = null;
-                let s1_score = 0, s2_score = 0;
-                if (s1.isBye && !s2.isBye) { winner = s2.player; s2_score = 1; }
-                else if (!s1.isBye && s2.isBye) { winner = s1.player; s1_score = 1; }
-
-                round1Matches.push({
-                    p1: s1.player,
-                    p2: s2.player,
-                    seed1: s1.seedNum,
-                    seed2: s2.seedNum,
-                    score1: s1_score,
-                    score2: s2_score,
-                    winner: winner
-                });
-            }
-            rounds.push(round1Matches);
-
-            const maxDisplayRounds = (tournamentSize === 8 || tournamentSize === 12 || tournamentSize === 16) ? 2 : 3;
-
-            let prevMatches = round1Matches;
-            for (let r = 1; r < maxDisplayRounds; r++) {
-                let nextMatches = [];
-                for (let i = 0; i < Math.max(1, prevMatches.length / 2); i++) {
-                    nextMatches.push({
-                        p1: { name: 'TBD' },
-                        p2: { name: 'TBD' },
-                        seed1: '-',
-                        seed2: '-',
-                        score1: 0,
-                        score2: 0,
-                        winner: null
-                    });
+            let entrants = assignedSeeds.map(x => ({player:x.player, seed:x.seedNum, isBye:x.isBye}));
+            let roundIndex = 0;
+            while (entrants.length > target && roundIndex < 12) {
+                if (entrants.length % 2) entrants.push({player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+                const matches=[];
+                for(let i=0;i<entrants.length;i+=2) {
+                    const a=entrants[i],b=entrants[i+1];
+                    const winner = a.isBye && !b.isBye ? b.player : b.isBye && !a.isBye ? a.player : null;
+                    matches.push({p1:a.player,p2:b.player,seed1:a.seed,seed2:b.seed,score1:0,score2:0,winner});
                 }
-                rounds.push(nextMatches);
-                prevMatches = nextMatches;
+                rounds.push(matches);
+                entrants = matches.map((m,i)=>({player:{name:'TBD'},seed:'-',isBye:false}));
+                roundIndex++;
             }
-
-            bracketData = { rounds };
+            bracketData={rounds};
             propagateBracketWinners();
-            saveAllToStorage();
-            renderBracketTree();
-            showToast(`對戰樹狀圖初始化成功 (顯示 ${maxDisplayRounds} 輪)！`);
+            saveAllToStorage(); renderBracketTree();
+            showToast(`對戰樹初始化成功，共 ${rounds.length} 輪`);
         }
-
         function propagateBracketWinners() {
-            if (!bracketData.rounds || bracketData.rounds.length === 0) return;
-
-            for (let r = 0; r < bracketData.rounds.length - 1; r++) {
-                const currentRound = bracketData.rounds[r];
-                const nextRound = bracketData.rounds[r + 1];
-                if (!nextRound) break;
-
-                for (let i = 0; i < nextRound.length; i++) {
-                    const m1 = currentRound[i * 2];
-                    const m2 = currentRound[i * 2 + 1];
-                    if (m1) nextRound[i].p1 = m1.winner || { name: 'TBD' };
-                    if (m2) nextRound[i].p2 = m2.winner || { name: 'TBD' };
+            const rounds=bracketData.rounds || [];
+            for(let r=1;r<rounds.length;r++) {
+                const prev=rounds[r-1], current=rounds[r];
+                for(let i=0;i<current.length;i++) {
+                    const m=current[i];
+                    const a=prev[i*2], b=prev[i*2+1];
+                    const p1=a?.winner || {name:'TBD'};
+                    const p2=b ? (b.winner || {name:'TBD'}) : {id:`BYE_R${r}_${i}`,name:'輪空 (BYE)'};
+                    const changed=m.p1?.id!==p1.id || m.p2?.id!==p2.id;
+                    m.p1=p1; m.p2=p2;
+                    if(changed) {m.score1=0;m.score2=0;m.winner=null;}
+                    if(p1.id && p2.name.includes('BYE')) m.winner=p1;
+                    else if(p2.id && p1.name.includes('BYE')) m.winner=p2;
                 }
             }
             saveAllToStorage(false);
         }
-
         function getPlayerPaymentTag(playerObj) {
             if (!playerObj || !playerObj.id || playerObj.name === 'TBD' || playerObj.name.includes('BYE')) return '';
             const found = players.find(p => p.id === playerObj.id);
@@ -1108,7 +1150,7 @@
 
             container.innerHTML = '';
             const totalR = bracketData.rounds.length;
-            const roundNames = totalR === 2 ? ['第一輪 (Round 1)', '第二輪 (Round 2)'] : ['第一輪 (Round 1)', '第二輪 (Round 2)', '第三輪 (Round 3)'];
+            const roundNames = Array.from({length:totalR},(_,i)=>`第 ${i+1} 輪 (Round ${i+1})`);
 
             bracketData.rounds.forEach((round, rIdx) => {
                 const col = document.createElement('div');
@@ -1125,7 +1167,7 @@
                 round.forEach((m, mIdx) => {
                     const matchCard = document.createElement('div');
                     matchCard.className = "bg-bey-dark border border-bey-border hover:border-bey-accent rounded-2xl p-3 shadow-lg space-y-2 cursor-pointer transition-all";
-                    matchCard.setAttribute('onclick', `openMatchModal(${rIdx}, ${mIdx})`);
+                    if (!treeSwapMode) matchCard.setAttribute('onclick', `openMatchModal(${rIdx}, ${mIdx})`);
 
                     const p1IsWinner = m.winner && m.winner.id === m.p1.id;
                     const p2IsWinner = m.winner && m.winner.id === m.p2.id;
@@ -1145,6 +1187,17 @@
                             <span class="font-orbitron font-black text-bey-accent">${m.score2}</span>
                         </div>
                     `;
+                    if (treeSwapMode && rIdx === 0) {
+                        matchCard.classList.remove('cursor-pointer');
+                        [0,1].forEach(side => {
+                            const row=matchCard.children[side];
+                            const idx=mIdx*2+side;
+                            if(!assignedSeeds[idx]) return;
+                            row.classList.add('cursor-pointer','hover:bg-sky-500/20');
+                            if(treeSwapSelected.includes(idx)) row.classList.add('ring-2','ring-amber-400','bg-amber-500/20');
+                            row.onclick=(event)=>{event.stopPropagation();chooseTreeSwapSeed(idx);};
+                        });
+                    } else if(treeSwapMode) matchCard.classList.add('opacity-60');
                     matchesDiv.appendChild(matchCard);
                 });
 
@@ -1154,6 +1207,7 @@
         }
 
         function openMatchModal(rIdx, mIdx) {
+            cSidesSwapped = false;
             activeModalRef = { rIdx, mIdx };
             const m = bracketData.rounds[rIdx][mIdx];
             if (!m.p1 || !m.p2 || m.p1.name === 'TBD' || m.p2.name === 'TBD') {
@@ -1174,6 +1228,7 @@
             updateFaultButtons();
 
             document.getElementById('matchModal').classList.remove('hidden');
+            renderCSides();
         }
 
         function closeMatchModal() {
@@ -1265,13 +1320,7 @@
                 });
             }
 
-            if (qualified.length < rrType) {
-                players.forEach(p => {
-                    if (!qualified.some(q => q.id === p.id) && qualified.length < rrType) {
-                        qualified.push(p);
-                    }
-                });
-            }
+            if (qualified.length < rrType) { showToast(`C 頁面尚未產生足夠晉級選手（目前 ${qualified.length}/${rrType}）`); return; }
 
             qualified = qualified.slice(0, rrType);
             if (qualified.length < 2) {
@@ -1279,6 +1328,26 @@
                 return;
             }
 
+            if (rrType === 4) {
+                if (top3Data.players?.length && !confirm('重新抽籤將清除目前 D 頁面所有比賽結果，確定繼續？')) return;
+                const shuffled = [...qualified];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                top3Data = {
+                    format: 'four_knockout', players: shuffled,
+                    matches: [
+                        {p1:shuffled[0],p2:shuffled[1],s1:0,s2:0,winnerId:null},
+                        {p1:shuffled[2],p2:shuffled[3],s1:0,s2:0,winnerId:null},
+                        {p1:null,p2:null,s1:0,s2:0,winnerId:null},
+                        {p1:null,p2:null,s1:0,s2:0,winnerId:null}
+                    ]
+                };
+                saveAllToStorage(); renderTop3Section(); switchTab('D');
+                showToast('四強已隨機配對！準決賽勝者爭冠亞，敗者爭季殿');
+                return;
+            }
             let matches = [];
             for (let i = 0; i < qualified.length; i++) {
                 for (let j = i + 1; j < qualified.length; j++) {
@@ -1304,11 +1373,11 @@
         }
 
         function clearRoundRobinData() {
-            if (!confirm('確定要清除決賽循環賽數據嗎？')) return;
+            if (!confirm('確定要清除 D 頁面決賽數據嗎？')) return;
             top3Data = { players: [], matches: [] };
             saveAllToStorage();
             renderTop3Section();
-            showToast('已清除決賽循環資料');
+            showToast('已清除決賽資料');
         }
 
         function renderTop3Section() {
@@ -1320,12 +1389,16 @@
                 container.innerHTML = `
                     <div class="col-span-full py-12 text-center text-slate-500 bg-bey-dark/60 rounded-xl border border-bey-border">
                         <i class="fa-solid fa-trophy text-3xl mb-2 block"></i>
-                        尚未開啟循環賽，請點擊上方【根據 C 頁面開啟循環賽】
+                        尚未建立決賽，請點擊上方讀取 C 頁面晉級者
                     </div>`;
                 leaderboard.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">循環賽名單尚未產生</p>`;
                 return;
             }
 
+            if (top3Data.format === 'four_knockout') {
+                renderFourKnockout(container, leaderboard);
+                return;
+            }
             container.innerHTML = '';
             top3Data.matches.forEach((m, idx) => {
                 const card = document.createElement('div');
@@ -1430,10 +1503,65 @@
             });
         }
 
+        // 四強排名賽：準決賽 0、1；冠亞賽 2；季殿賽 3。
+        function syncFourKnockout() {
+            if (top3Data.format !== 'four_knockout') return;
+            const ms = top3Data.matches;
+            const winner = m => m?.winnerId ? [m.p1,m.p2].find(p => p?.id === m.winnerId) || null : null;
+            const loser = m => m?.winnerId ? [m.p1,m.p2].find(p => p && p.id !== m.winnerId) || null : null;
+            [[winner(ms[0]),winner(ms[1])],[loser(ms[0]),loser(ms[1])]].forEach((pair,k) => {
+                const m = ms[k+2];
+                const oldKey = [m.p1?.id,m.p2?.id].join('|');
+                const newKey = pair.map(p=>p?.id).join('|');
+                if (oldKey !== newKey) {
+                    m.p1 = pair[0]; m.p2 = pair[1];
+                    m.s1 = 0; m.s2 = 0; m.winnerId = null;
+                }
+            });
+        }
+        function renderFourKnockout(container, leaderboard) {
+            syncFourKnockout();
+            const labels = ['準決賽 ①','準決賽 ②','冠亞軍決定戰','季殿軍決定戰'];
+            const stages = ['第一階段：四強準決賽','第二階段：排名決定戰'];
+            container.innerHTML = '';
+            top3Data.matches.forEach((m,idx) => {
+                if (idx === 0 || idx === 2) {
+                    const h = document.createElement('h4');
+                    h.className = 'col-span-full text-sm font-black text-bey-gold mt-3';
+                    h.textContent = stages[idx===0?0:1]; container.appendChild(h);
+                }
+                const ready = Boolean(m.p1 && m.p2);
+                const card = document.createElement('div');
+                card.className = 'bg-bey-dark border border-bey-border rounded-2xl p-4 space-y-3 shadow-lg';
+                const name = p => p ? escapeHtmlFinal(p.name) : '等待準決賽結果';
+                card.innerHTML = `<div class="flex justify-between items-center gap-2 border-b border-bey-border pb-2">
+                    <span class="text-xs font-black text-bey-gold">${labels[idx]}</span>
+                    <button ${ready?'':'disabled'} onclick="openDMatchModal(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-bey-accent/20 text-bey-accent disabled:opacity-30">開啟計分板</button></div>
+                    <div class="grid grid-cols-5 gap-2 items-center text-center">
+                    <div class="col-span-2 min-w-0"><div class="text-sm font-bold break-words ${m.winnerId&&m.winnerId===m.p1?.id?'text-bey-gold':'text-white'}">${name(m.p1)}</div><div class="text-2xl font-black text-bey-accent">${m.s1||0}</div></div>
+                    <div class="text-slate-400 font-bold">VS</div>
+                    <div class="col-span-2 min-w-0"><div class="text-sm font-bold break-words ${m.winnerId&&m.winnerId===m.p2?.id?'text-bey-gold':'text-white'}">${name(m.p2)}</div><div class="text-2xl font-black text-bey-accent">${m.s2||0}</div></div></div>
+                    <div class="text-center text-xs ${m.winnerId?'text-emerald-400':'text-slate-400'}">${m.winnerId ? '勝出：'+name([m.p1,m.p2].find(p=>p?.id===m.winnerId)) : (ready?'尚未判定勝者':'等待兩場準決賽完成')}</div>`;
+                container.appendChild(card);
+            });
+            const ms = top3Data.matches;
+            const find = (m,id) => [m.p1,m.p2].find(p=>p?.id===id);
+            const champion = ms[2].winnerId ? find(ms[2],ms[2].winnerId) : null;
+            const runner = champion ? [ms[2].p1,ms[2].p2].find(p=>p.id!==champion.id) : null;
+            const third = ms[3].winnerId ? find(ms[3],ms[3].winnerId) : null;
+            const fourth = third ? [ms[3].p1,ms[3].p2].find(p=>p.id!==third.id) : null;
+            const ranks = [['冠軍',champion,'fa-trophy','text-yellow-400'],['亞軍',runner,'fa-medal','text-slate-300'],['季軍',third,'fa-award','text-amber-500'],['殿軍',fourth,'fa-star','text-blue-400']];
+            leaderboard.innerHTML = ranks.map(([title,p,icon,color]) => `<div class="rounded-xl border border-bey-border bg-bey-dark/60 p-3 flex items-center gap-3"><i class="fa-solid ${icon} ${color} text-xl"></i><div><div class="text-xs text-slate-400">${title}</div><div class="font-bold text-white">${p?escapeHtmlFinal(p.name):'待決定'}</div></div></div>`).join('');
+        }
+        function escapeHtmlFinal(value) {
+            return String(value??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
         function openDMatchModal(idx) {
+            dSidesSwapped = false;
             activeDModalIdx = idx;
             const m = top3Data.matches[idx];
-            document.getElementById('modalDMatchTitle').innerText = `循環對戰 G${idx + 1} 計分`;
+            if (!m?.p1 || !m?.p2) { showToast('請先完成兩場準決賽'); return; }
+            document.getElementById('modalDMatchTitle').innerText = top3Data.format === 'four_knockout' ? ['準決賽 ①','準決賽 ②','冠亞軍決定戰','季殿軍決定戰'][idx] : `循環對戰 G${idx + 1} 計分`;
             document.getElementById('modalDP1Name').innerText = m.p1.name;
             document.getElementById('modalDP1Score').innerText = m.s1 || 0;
             document.getElementById('modalDP2Name').innerText = m.p2.name;
@@ -1442,6 +1570,7 @@
             activeFaults = { p1: 0, p2: 0 };
             updateDModalFaultButtons();
             document.getElementById('dMatchModal').classList.remove('hidden');
+            renderDSides();
         }
 
         function closeDMatchModal() {
@@ -1505,7 +1634,7 @@
             const m = top3Data.matches[activeDModalIdx];
             if (playerNum === 1) m.winnerId = m.p1.id;
             else m.winnerId = m.p2.id;
-
+            syncFourKnockout();
             saveAllToStorage();
             renderTop3Section();
             closeDMatchModal();
@@ -1523,6 +1652,7 @@
             else if (m.s2 > m.s1) m.winnerId = m.p2.id;
             else m.winnerId = null;
 
+            syncFourKnockout();
             saveAllToStorage();
             renderTop3Section();
         }
@@ -1531,6 +1661,7 @@
             const m = top3Data.matches[mIdx];
             if (playerNum === 1) m.winnerId = m.p1.id;
             else m.winnerId = m.p2.id;
+            syncFourKnockout();
             saveAllToStorage();
             renderTop3Section();
             showToast('已記錄勝場！');
