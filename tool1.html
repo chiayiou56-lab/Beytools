@@ -261,7 +261,7 @@
                         <h2 class="font-orbitron font-bold text-base text-bey-accent flex items-center space-x-2">
                             <i class="fa-solid fa-sitemap"></i><span>淘汰賽對戰樹狀圖 (限顯示前三輪)</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">點擊任意對戰卡片可開啟大型計分模式；獲勝者將自動晉級下一輪。</p>
+                        <p class="text-xs text-slate-400 mt-1">每輪結束後重新隨機配對下一輪；點擊對戰卡片可計分，確認勝者後自動更新賽程。</p>
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="confirmBracketReset()" class="px-4 py-2 bg-gradient-to-r from-bey-accent to-blue-600 hover:from-blue-500 hover:to-blue-700 text-bey-dark font-bold text-xs rounded-xl shadow-md transition-all">
@@ -272,7 +272,7 @@
 
                 <div class="bg-bey-dark/70 border border-bey-border rounded-xl p-4 space-y-3">
                     <div class="flex flex-wrap items-center justify-between gap-3"><div class="font-bold text-sm text-bey-gold"><i class="fa-solid fa-right-left mr-2"></i>手動對調選手</div><button id="toggleTreeSwapBtn" onclick="toggleTreeSwapMode()" class="bg-bey-accent text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">開啟對調模式</button></div>
-                    <p id="treeSwapHint" class="text-xs text-slate-400">開啟後，直接點選第一輪樹狀圖上的兩位選手，再按確認對調。可選輪空籤位。</p>
+                    <p id="treeSwapHint" class="text-xs text-slate-400">開啟後，直接點選第一輪樹狀圖上的兩位選手，再按確認對調。可選輪空籤位；對調保留現有配對、比分與勝負紀錄。</p>
                     <div id="treeSwapActions" class="hidden flex flex-wrap gap-2 items-center"><span id="treeSwapSelection" class="text-xs text-bey-gold flex-1">尚未選取選手</span><button onclick="confirmTreeSwap()" class="bg-amber-400 text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">確認對調</button><button onclick="clearTreeSwapSelection()" class="bg-slate-700 text-white rounded-lg px-4 py-2 text-xs font-bold">清除選取</button></div>
                 </div>
 
@@ -953,7 +953,7 @@
             let pool = [...players];
             if (pool.length === 0) { showToast('請先於 A 頁面新增選手'); return; }
 
-            const shuffled = [...pool].sort(() => Math.random() - 0.5);
+            const shuffled = shuffleCEntrants(pool);
             const totalSlots = tournamentSize % 2 === 0 ? tournamentSize : tournamentSize + 1;
             const actualPlayerCount = Math.min(shuffled.length, tournamentSize);
             const byeCount = totalSlots - actualPlayerCount;
@@ -966,7 +966,7 @@
                 items.push({ player: { id: 'BYE_' + i, name: '輪空 (BYE)', paid: true }, isBye: true });
             }
 
-            items.sort(() => Math.random() - 0.5);
+            items = shuffleCEntrants(items);
 
             assignedSeeds = [];
             items.forEach((item, idx) => {
@@ -1028,12 +1028,13 @@
             const btn = document.getElementById('toggleTreeSwapBtn');
             if (btn) btn.textContent = treeSwapMode ? '關閉對調模式' : '開啟對調模式';
             document.getElementById('treeSwapActions')?.classList.toggle('hidden', !treeSwapMode);
-            const selected = treeSwapSelected.map(i => `#${i+1} ${assignedSeeds[i]?.player?.name || '輪空'}`);
+            const first = bracketData.rounds?.[0] || [];
+            const selected = treeSwapSelected.map(i => `位置 ${i+1} ${first[Math.floor(i/2)]?.[i%2 ? "p2" : "p1"]?.name || "輪空"}`);
             const hint = document.getElementById('treeSwapSelection');
             if (hint) hint.textContent = selected.length ? selected.join(' ⇄ ') : '請在第一輪點選兩位選手';
         }
         function chooseTreeSwapSeed(index) {
-            if (!treeSwapMode || !assignedSeeds[index]) return;
+            if (!treeSwapMode || !bracketData.rounds?.[0]?.[Math.floor(index/2)]) return;
             if (treeSwapSelected.includes(index)) treeSwapSelected = treeSwapSelected.filter(i => i !== index);
             else if (treeSwapSelected.length >= 2) treeSwapSelected = [index];
             else treeSwapSelected.push(index);
@@ -1042,13 +1043,26 @@
         function confirmTreeSwap() {
             if (treeSwapSelected.length !== 2) { showToast('請先點選兩位不同選手'); return; }
             const [i,j] = treeSwapSelected;
-            if (!confirm(`確定交換 #${i+1} ${assignedSeeds[i].player.name} 與 #${j+1} ${assignedSeeds[j].player.name}？\n淘汰賽比分及晉級紀錄將重新初始化。`)) return;
-            const a=assignedSeeds[i], b=assignedSeeds[j];
-            [a.player,b.player]=[b.player,a.player];
-            [a.isBye,b.isBye]=[b.isBye,a.isBye];
+            const first = bracketData.rounds?.[0] || [];
+            const slotA = first[Math.floor(i/2)], slotB = first[Math.floor(j/2)];
+            if (!slotA || !slotB) return;
+            const keyA = i%2 ? 'p2':'p1', keyB = j%2 ? 'p2':'p1';
+            const playerA = slotA[keyA], playerB = slotB[keyB];
+            if (!playerA || !playerB || playerA.id === playerB.id) return;
+            if (!confirm(`確定交換 ${playerA.name} 與 ${playerB.name}？\n將保留所有對戰配對、比分及勝負紀錄。`)) return;
+            // 全部輪次同步交換選手身分；比分、勝負所屬位置及對戰順序均不變。
+            const remap = p => p?.id === playerA.id ? playerB : p?.id === playerB.id ? playerA : p;
+            for (const round of bracketData.rounds || []) for (const m of round) {
+                m.p1 = remap(m.p1); m.p2 = remap(m.p2);
+                if (m.winner) m.winner = remap(m.winner);
+            }
+            for (const seed of assignedSeeds) {
+                seed.player = remap(seed.player);
+                seed.isBye = !!seed.player?.id?.startsWith('BYE_');
+            }
             treeSwapSelected=[];
-            generateBracketFromDraw(); renderAssignedSeeds(); refreshTreeSwapUI();
-            showToast('選手對調完成，已同步賽程');
+            saveAllToStorage(); renderAssignedSeeds(); refreshTreeSwapUI(); renderBracketTree();
+            showToast('已交換選手位置，比分與對戰樹均保留');
         }
         function cActualSide(side) { return cSidesSwapped ? 3-side : side; }
         function dActualSide(side) { return dSidesSwapped ? 3-side : side; }
@@ -1082,50 +1096,71 @@
         function displayDWinner(side) { confirmDModalWinner(dActualSide(side)); }
 
         function confirmBracketReset() {
-            if (!confirm("確定要重新初始化對戰樹嗎？\n目前 C 頁面的對戰比分、勝負與晉級紀錄將被清除，且會同步至雲端。")) return;
-            generateBracketFromDraw();
+            if (!bracketData.rounds?.length) { showToast('目前沒有可重置的對戰樹'); return; }
+            if (!confirm('確定只重置 C 頁面的比分、失誤與勝負紀錄嗎？\n所有輪次的選手排序與配對都會保留。')) return;
+            for (const round of bracketData.rounds) for (const m of round) {
+                m.score1 = 0; m.score2 = 0;
+                m.fault1 = 0; m.fault2 = 0;
+                m.winner = m.p1?.id?.startsWith('BYE_') ? m.p2 : m.p2?.id?.startsWith('BYE_') ? m.p1 : null;
+            }
+            saveAllToStorage(); renderBracketTree();
+            showToast('已重置比分與勝負紀錄，原本配對排序不變');
         }
 
+        // 每輪獨立抽籤：只有本輪全部確認勝者後，才隨機產生下一輪。
+        function shuffleCEntrants(items) {
+            const result = [...items];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+        function makeCRound(entrants, roundIndex) {
+            let pool = shuffleCEntrants(entrants);
+            if (pool.length % 2) pool.push({player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+            // 避免輪空互打；正常情況每輪最多新增一個輪空。
+            const matches = [];
+            for (let i = 0; i < pool.length; i += 2) {
+                const a=pool[i], b=pool[i+1];
+                const winner = a.isBye && !b.isBye ? b.player : b.isBye && !a.isBye ? a.player : null;
+                matches.push({p1:a.player,p2:b.player,seed1:a.seed,seed2:b.seed,score1:0,score2:0,winner});
+            }
+            return matches;
+        }
         function generateBracketFromDraw() {
             if (!assignedSeeds.length) {
                 if (!players.length) { showToast('請先新增選手'); return; }
                 executeShuffleAndAssign(); return;
             }
-            const target = tournamentSize === 24 ? 3 : Math.min(4, Math.max(2, tournamentSize));
-            const rounds = [];
-            let entrants = assignedSeeds.map(x => ({player:x.player, seed:x.seedNum, isBye:x.isBye}));
-            let roundIndex = 0;
-            while (entrants.length > target && roundIndex < 12) {
-                if (entrants.length % 2) entrants.push({player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
-                const matches=[];
-                for(let i=0;i<entrants.length;i+=2) {
-                    const a=entrants[i],b=entrants[i+1];
-                    const winner = a.isBye && !b.isBye ? b.player : b.isBye && !a.isBye ? a.player : null;
-                    matches.push({p1:a.player,p2:b.player,seed1:a.seed,seed2:b.seed,score1:0,score2:0,winner});
-                }
-                rounds.push(matches);
-                entrants = matches.map((m,i)=>({player:{name:'TBD'},seed:'-',isBye:false}));
-                roundIndex++;
-            }
-            bracketData={rounds};
+            const entrants = assignedSeeds.map(x=>({player:x.player,seed:x.seedNum,isBye:x.isBye}));
+            bracketData = {rounds:[makeCRound(entrants,0)]};
             propagateBracketWinners();
             saveAllToStorage(); renderBracketTree();
-            showToast(`對戰樹初始化成功，共 ${rounds.length} 輪`);
+            showToast('第一輪已完成隨機配對；每輪結束後會重新隨機配對下一輪');
         }
         function propagateBracketWinners() {
-            const rounds=bracketData.rounds || [];
-            for(let r=1;r<rounds.length;r++) {
-                const prev=rounds[r-1], current=rounds[r];
-                for(let i=0;i<current.length;i++) {
-                    const m=current[i];
-                    const a=prev[i*2], b=prev[i*2+1];
-                    const p1=a?.winner || {name:'TBD'};
-                    const p2=b ? (b.winner || {name:'TBD'}) : {id:`BYE_R${r}_${i}`,name:'輪空 (BYE)'};
-                    const changed=m.p1?.id!==p1.id || m.p2?.id!==p2.id;
-                    m.p1=p1; m.p2=p2;
-                    if(changed) {m.score1=0;m.score2=0;m.winner=null;}
-                    if(p1.id && p2.name.includes('BYE')) m.winner=p1;
-                    else if(p2.id && p1.name.includes('BYE')) m.winner=p2;
+            const rounds = bracketData.rounds || [];
+            const target = tournamentSize === 24 ? 3 : Math.min(4,Math.max(2,tournamentSize));
+            for (let r=0; r<rounds.length; r++) {
+                const current = rounds[r];
+                const completed = current.every(m=>m.winner && m.winner.id && !String(m.winner.id).startsWith('BYE_'));
+                if (!completed) {
+                    // 修改前輪結果時，後續尚未完成的配對不可沿用。
+                    if (rounds.length > r+1) rounds.splice(r+1);
+                    break;
+                }
+                const winners = current.map(m=>m.winner);
+                if (winners.length <= target) {
+                    if (rounds.length > r+1) rounds.splice(r+1);
+                    break;
+                }
+                const existing = rounds[r+1];
+                const existingIds = existing ? existing.flatMap(m=>[m.p1?.id,m.p2?.id]).filter(id=>id && !String(id).startsWith('BYE_')).sort() : [];
+                const winnerIds = winners.map(p=>p.id).sort();
+                if (!existing || JSON.stringify(existingIds)!==JSON.stringify(winnerIds)) {
+                    rounds.splice(r+1);
+                    rounds.push(makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1));
                 }
             }
             saveAllToStorage(false);
@@ -1192,7 +1227,7 @@
                         [0,1].forEach(side => {
                             const row=matchCard.children[side];
                             const idx=mIdx*2+side;
-                            if(!assignedSeeds[idx]) return;
+                            if(!m[side === 0 ? "p1" : "p2"]) return;
                             row.classList.add('cursor-pointer','hover:bg-sky-500/20');
                             if(treeSwapSelected.includes(idx)) row.classList.add('ring-2','ring-amber-400','bg-amber-500/20');
                             row.onclick=(event)=>{event.stopPropagation();chooseTreeSwapSeed(idx);};
