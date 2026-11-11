@@ -1179,6 +1179,13 @@
             if (rIdx === null || mIdx === null) return;
             const m = bracketData.rounds[rIdx][mIdx];
 
+            // 任一方實際加分時，雙方累積失誤次數一併歸零
+            const previousScore = playerNum === 1 ? (m.score1 || 0) : (m.score2 || 0);
+            if (val > 0 && previousScore + val > previousScore) {
+                activeFaults = { p1: 0, p2: 0 };
+                updateFaultButtons();
+            }
+
             if (playerNum === 1) {
                 m.score1 = Math.max(0, (m.score1 || 0) + val);
                 document.getElementById('modalP1Score').innerText = m.score1;
@@ -1437,6 +1444,14 @@
         function addDModalScore(playerNum, val) {
             if (activeDModalIdx === null) return;
             const m = top3Data.matches[activeDModalIdx];
+
+            // 任一方實際加分時，雙方累積失誤次數一併歸零
+            const previousScore = playerNum === 1 ? (m.s1 || 0) : (m.s2 || 0);
+            if (val > 0 && previousScore + val > previousScore) {
+                activeFaults = { p1: 0, p2: 0 };
+                updateDModalFaultButtons();
+            }
+
             if (playerNum === 1) {
                 m.s1 = Math.max(0, (m.s1 || 0) + val);
                 document.getElementById('modalDP1Score').innerText = m.s1;
