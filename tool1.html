@@ -225,11 +225,15 @@
                     </div>
                 </div>
 
-                <!-- Size Selection Buttons (12, 16, 24) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Size Selection Buttons (8, 12, 16, 24) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <button onclick="setTournamentSize(8)" id="sizeBtn8" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
+                        <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">8 人賽制</div>
+                        <div class="text-[11px] text-slate-400 mt-1">取前2名決賽</div>
+                    </button>
                     <button onclick="setTournamentSize(12)" id="sizeBtn12" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
                         <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">12 人賽制</div>
-                        <div class="text-[11px] text-slate-400 mt-1">取前2名決賽</div>
+                        <div class="text-[11px] text-slate-400 mt-1">取前3名決賽</div>
                     </button>
                     <button onclick="setTournamentSize(16)" id="sizeBtn16" class="p-4 rounded-xl border border-bey-border bg-bey-dark hover:border-bey-accent transition-all text-center group">
                         <div class="font-orbitron font-black text-xl text-white group-hover:text-bey-accent">16 人賽制</div>
@@ -273,7 +277,7 @@
                         <p class="text-xs text-slate-400 mt-1">點擊任意對戰卡片可開啟大型計分模式；獲勝者將自動晉級下一輪。</p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="generateBracketFromDraw()" class="px-4 py-2 bg-gradient-to-r from-bey-accent to-blue-600 hover:from-blue-500 hover:to-blue-700 text-bey-dark font-bold text-xs rounded-xl shadow-md transition-all">
+                        <button onclick="confirmBracketReset()" class="px-4 py-2 bg-gradient-to-r from-bey-accent to-blue-600 hover:from-blue-500 hover:to-blue-700 text-bey-dark font-bold text-xs rounded-xl shadow-md transition-all">
                             重新初始化對戰樹
                         </button>
                     </div>
@@ -918,7 +922,7 @@
         }
 
         function updatePageBUI() {
-            [12, 16, 24].forEach(sz => {
+            [8, 12, 16, 24].forEach(sz => {
                 const btn = document.getElementById(`sizeBtn${sz}`);
                 if (btn) {
                     if (sz === tournamentSize) {
@@ -1005,6 +1009,11 @@
             });
         }
 
+        function confirmBracketReset() {
+            if (!confirm("確定要重新初始化對戰樹嗎？\n目前 C 頁面的對戰比分、勝負與晉級紀錄將被清除，且會同步至雲端。")) return;
+            generateBracketFromDraw();
+        }
+
         function generateBracketFromDraw() {
             if (assignedSeeds.length === 0) {
                 if (players.length === 0) { showToast('請先新增選手'); return; }
@@ -1034,7 +1043,7 @@
             }
             rounds.push(round1Matches);
 
-            const maxDisplayRounds = (tournamentSize === 12 || tournamentSize === 16) ? 2 : 3;
+            const maxDisplayRounds = (tournamentSize === 8 || tournamentSize === 12 || tournamentSize === 16) ? 2 : 3;
 
             let prevMatches = round1Matches;
             for (let r = 1; r < maxDisplayRounds; r++) {
