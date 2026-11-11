@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c1426">
+<title>比賽工具首頁</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1426;--card:#16233b;--border:#30415d;--text:#f8fafc;--muted:#9fb0c9;--accent:#fbbf24}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at top,#1c3153 0%,var(--bg) 65%);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:var(--text);display:flex;justify-content:center;align-items:center;padding:30px 16px}
+main{width:min(100%,560px)}header{text-align:center;margin-bottom:28px}.eyebrow{color:#7dd3fc;font-weight:800;letter-spacing:.2em;font-size:12px}h1{font-size:clamp(28px,6vw,38px);margin:10px 0;color:var(--accent)}.sub{font-size:14px;color:var(--muted);line-height:1.7}.links{display:grid;gap:14px}.tool{display:flex;align-items:center;gap:17px;text-decoration:none;color:inherit;background:linear-gradient(120deg,#1c2e4a,#142039);border:1px solid var(--border);border-radius:19px;padding:22px 19px;min-height:104px;box-shadow:0 10px 25px #0003;transition:transform .15s,border-color .15s}.tool:hover,.tool:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}.ico{display:grid;place-items:center;flex-shrink:0;width:58px;height:58px;border-radius:15px;background:#ffffff12;font-size:30px}.details{flex:1;min-width:0}.name{font-size:20px;font-weight:850;margin:0 0 6px}.desc{font-size:12px;color:var(--muted);margin:0}.arrow{font-size:26px;color:var(--accent)}footer{text-align:center;color:#7486a2;font-size:12px;margin-top:27px}@media(max-width:420px){.tool{padding:18px 14px;gap:12px}.ico{width:50px;height:50px}.name{font-size:18px}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">TOURNAMENT TOOLKIT</div><h1>🏆 比賽工具首頁</h1><div class="sub">請選擇要使用的工具</div></header>
+<nav class="links" aria-label="工具選單">
+<a class="tool" href="tool1.html"><span class="ico" aria-hidden="true">⚔️</span><span class="details"><span class="name">比賽小工具</span><p class="desc">開啟比賽管理與操作頁面</p></span><span class="arrow" aria-hidden="true">›</span></a>
+<a class="tool" href="tool2.html"><span class="ico" aria-hidden="true">📊</span><span class="details"><span class="name">比賽即時查詢</span><p class="desc">查看淘汰賽進度與決賽排行榜</p></span><span class="arrow" aria-hidden="true">›</span></a>
+<a class="tool" href="tool3.html"><span class="ico" aria-hidden="true">🎁</span><span class="details"><span class="name">獎品計算小工具</span><p class="desc">開啟獎品計算頁面</p></span><span class="arrow" aria-hidden="true">›</span></a>
+</nav>
+<footer>請將 index.html 與 tool1.html、tool2.html、tool3.html 放在相同資料夾</footer>
+</main>
+</body>
+</html>
