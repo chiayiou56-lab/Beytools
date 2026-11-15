@@ -1124,7 +1124,26 @@
         }
         function makeCRound(entrants, roundIndex) {
             let pool = shuffleCEntrants(entrants);
-            if (pool.length % 2) pool.push({player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+            if (pool.length % 2) {
+                // 已輪空選手由既有賽程推算，避免重新整理後遺失紀錄。
+                const previousByes = new Set();
+                for (const round of (bracketData.rounds || []).slice(0, roundIndex)) {
+                    for (const m of round) {
+                        if (isByePlayer(m.p1) !== isByePlayer(m.p2)) {
+                            const player = isByePlayer(m.p1) ? m.p2 : m.p1;
+                            previousByes.add(String(player.id));
+                        }
+                    }
+                }
+                // pool 已隨機排序，從尚未輪空的人中隨機選擇一位。
+                const eligibleIndex = pool.findIndex(x => !x.isBye && !previousByes.has(String(x.player.id)));
+                if (eligibleIndex < 0) {
+                    showToast('剩餘選手都已輪空過，無法安排不重複輪空');
+                    return null;
+                }
+                const [byePlayer] = pool.splice(eligibleIndex, 1);
+                pool.push(byePlayer, {player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+            }
             // 避免輪空互打；正常情況每輪最多新增一個輪空。
             const matches = [];
             for (let i = 0; i < pool.length; i += 2) {
@@ -1186,9 +1205,11 @@
                         if (byePlayer && revived) {
                             const remaining = winners.filter(p=>p.id !== revived.id && p.id !== byePlayer.id);
                             const forced = {p1:byePlayer,p2:revived,seed1:'-',seed2:'-',score1:0,score2:0,winner:null};
-                            rounds.push([forced,...makeCRound(remaining.map(p=>({player:p,seed:'-',isBye:false})),r+1)]);
-                        } else rounds.push(makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1));
-                    } else rounds.push(makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1));
+                            const rest = makeCRound(remaining.map(p=>({player:p,seed:'-',isBye:false})),r+1);
+                            if (!rest) break;
+                            rounds.push([forced,...rest]);
+                        } else { const next = makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1); if (!next) break; rounds.push(next); }
+                    } else { const next = makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1); if (!next) break; rounds.push(next); }
                 }
             }
             saveAllToStorage(false);
