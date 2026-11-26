@@ -255,6 +255,11 @@
 
         <!-- ==================== PAGE C: 淘汰賽樹狀圖 ==================== -->
         <section id="pageC" class="space-y-6 hidden">
+            <div class="bg-bey-card border border-bey-border rounded-2xl p-5 space-y-3">
+                <h2 class="font-bold text-bey-accent">📡 即時查詢公開設定</h2>
+                <p class="text-xs text-slate-400">開放後即時更新；關閉不影響本頁資料。請先確認雲端已連線。</p>
+                <div class="flex flex-wrap gap-3"><button id="publicCBtn" onclick="togglePublic('c')" class="px-4 py-3 rounded-xl font-bold bg-slate-700 text-white">C 頁對戰樹：關閉</button><button id="publicDBtn" onclick="togglePublic('d')" class="px-4 py-3 rounded-xl font-bold bg-slate-700 text-white">D 頁決賽：關閉</button><button onclick="startNewPublicContest()" class="px-4 py-3 rounded-xl font-bold bg-rose-700 text-white">開始新比賽（關閉公開）</button></div>
+            </div>
             <div class="bg-bey-card border border-bey-border rounded-2xl p-6 shadow-xl space-y-4">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-bey-border pb-4 gap-3">
                     <div>
@@ -274,6 +279,12 @@
                     <div class="flex flex-wrap items-center justify-between gap-3"><div class="font-bold text-sm text-bey-gold"><i class="fa-solid fa-right-left mr-2"></i>手動對調選手</div><button id="toggleTreeSwapBtn" onclick="toggleTreeSwapMode()" class="bg-bey-accent text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">開啟對調模式</button></div>
                     <p id="treeSwapHint" class="text-xs text-slate-400">開啟後，直接點選第一輪樹狀圖上的兩位選手，再按確認對調。可選輪空籤位；對調保留現有配對、比分與勝負紀錄。</p>
                     <div id="treeSwapActions" class="hidden flex flex-wrap gap-2 items-center"><span id="treeSwapSelection" class="text-xs text-bey-gold flex-1">尚未選取選手</span><button onclick="confirmTreeSwap()" class="bg-amber-400 text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">確認對調</button><button onclick="clearTreeSwapSelection()" class="bg-slate-700 text-white rounded-lg px-4 py-2 text-xs font-bold">清除選取</button></div>
+                </div>
+
+                <div class="bg-bey-dark/70 border border-amber-500/40 rounded-xl p-4 space-y-3">
+                    <div class="flex flex-wrap items-center gap-3"><span class="font-bold text-sm text-bey-gold">第一輪復活挑戰</span><button onclick="enableRevival()" id="revivalEnable" class="bg-amber-400 text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">啟用復活模式</button></div>
+                    <p id="revivalStatus" class="text-xs text-slate-400">啟用後，第一輪結束會等待選擇復活選手或無人復活，再安排第二輪。請在第二輪開始前啟用。</p>
+                    <div id="revivalControls" class="hidden flex flex-wrap gap-2"><select id="revivalPlayer" class="bg-bey-card border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></select><button onclick="decideRevival(true)" class="bg-bey-accent text-bey-dark rounded-lg px-4 py-2 text-xs font-bold">確認復活</button><button onclick="decideRevival(false)" class="bg-slate-700 text-white rounded-lg px-4 py-2 text-xs font-bold">無人復活</button></div>
                 </div>
 
                 <!-- Horizontal Scrollable Bracket Area -->
@@ -371,7 +382,7 @@
                     <h2 class="font-orbitron font-bold text-lg text-bey-gold flex items-center justify-center sm:justify-start space-x-2">
                         <i class="fa-solid fa-dice"></i><span>隨機號碼抽獎專區</span>
                     </h2>
-                    <p class="text-xs text-slate-400 mt-1">自訂號碼區間範圍，即可隨機抽出幸運號碼！</p>
+                    <p class="text-xs text-slate-400 mt-1">自訂號碼區間範圍，已抽出的號碼不會重複中獎；按「重設」才會重新開放。</p>
                 </div>
 
                 <!-- 範圍設定表單 -->
@@ -396,9 +407,14 @@
                     <div id="lotterySubText" class="text-xs text-slate-500">請設定號碼區間並點擊下方按鈕開始抽獎</div>
                 </div>
 
+                <div class="bg-bey-dark/60 border border-bey-border rounded-xl p-4 space-y-2">
+                    <div id="lotteryDrawCount" class="text-xs text-bey-accent font-bold">已抽出 0 個號碼</div>
+                    <div id="lotteryDrawHistory" class="text-xs text-slate-400 break-words">尚無抽獎紀錄</div>
+                </div>
+
                 <!-- 控制按鈕 -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button onclick="executeNumberLottery()" class="flex-1 py-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-bey-dark font-orbitron font-black text-sm uppercase tracking-wider rounded-xl shadow-xl transition-all flex items-center justify-center space-x-2">
+                    <button id="lotteryDrawButton" onclick="executeNumberLottery()" class="flex-1 py-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-bey-dark font-orbitron font-black text-sm uppercase tracking-wider rounded-xl shadow-xl transition-all flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-wand-magic-sparkles text-base"></i><span>開始隨機抽獎</span>
                     </button>
                     <button onclick="resetLottery()" class="px-5 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-bold text-xs rounded-xl transition-all">
@@ -546,6 +562,7 @@
         let assignedSeeds = [];
         let bracketData = { rounds: [] };
         let top3Data = { players: [], matches: [] };
+        let publicSettings = { c: false, d: false };
         let activeModalRef = { rIdx: null, mIdx: null };
         let activeDModalIdx = null;
         let cSidesSwapped = false;
@@ -566,6 +583,7 @@
             renderBracketTree();
             renderTop3Section();
             renderRandomPlayerDrawUI();
+            renderPublicSettings();
         };
 
         function initFirebase() {
@@ -585,6 +603,8 @@
                         assignedSeeds = cloudData.assignedSeeds || [];
                         bracketData = cloudData.bracketData || { rounds: [] };
                         top3Data = cloudData.top3Data || { players: [], matches: [] };
+                        publicSettings = { c: cloudData.publicSettings?.c === true, d: cloudData.publicSettings?.d === true };
+                        renderPublicSettings();
 
                         saveAllToStorage(false);
                         renderPlayerTable();
@@ -660,22 +680,49 @@
             if (tabId === 'E') renderRandomPlayerDrawUI();
         }
 
+        function renderPublicSettings() {
+            for (const [key, id, label] of [['c','publicCBtn','C 頁對戰樹'], ['d','publicDBtn','D 頁決賽']]) {
+                const button = document.getElementById(id);
+                if (!button) continue;
+                button.textContent = label + '：' + (publicSettings[key] ? '公開中' : '關閉');
+                button.className = 'px-4 py-3 rounded-xl font-bold text-white ' + (publicSettings[key] ? 'bg-emerald-700' : 'bg-slate-700');
+            }
+        }
+        function togglePublic(key) {
+            if (!isCloudConnected) { showToast('請先連線雲端，才能設定公開狀態'); return; }
+            publicSettings[key] = !publicSettings[key];
+            renderPublicSettings(); saveAllToStorage();
+        }
+        function startNewPublicContest() {
+            if (!isCloudConnected) { showToast('請先連線雲端，才能關閉公開'); return; }
+            if (!confirm('確定開始新比賽？將關閉 C、D 公開，保留目前選手、對戰表與比分。')) return;
+            publicSettings = { c: false, d: false };
+            renderPublicSettings(); saveAllToStorage();
+            showToast('已送出關閉 C、D 公開的設定');
+        }
+
         function saveAllToStorage(pushToCloud = true) {
             const payload = {
                 players,
                 tournamentSize,
                 assignedSeeds,
                 bracketData,
-                top3Data
+                top3Data,
+                publicSettings
             };
             localStorage.setItem('bey_players', JSON.stringify(players));
             localStorage.setItem('bey_size', JSON.stringify(tournamentSize));
             localStorage.setItem('bey_seeds', JSON.stringify(assignedSeeds));
             localStorage.setItem('bey_bracket', JSON.stringify(bracketData));
             localStorage.setItem('bey_top3', JSON.stringify(top3Data));
+            localStorage.setItem('bey_public_settings', JSON.stringify(publicSettings));
 
             if (pushToCloud && isCloudConnected && firebase.apps.length) {
-                firebase.database().ref('beybladeTournamentData').set(payload);
+                const publicPayload = { cOpen: publicSettings.c, dOpen: publicSettings.d,
+                    bracketData: publicSettings.c ? bracketData : null,
+                    top3Data: publicSettings.d ? top3Data : null };
+                firebase.database().ref().update({ beybladeTournamentData: payload, beybladePublicData: publicPayload })
+                    .catch(err => { console.error('雲端同步失敗:', err); showToast('公開設定或資料同步失敗，請檢查連線與資料庫權限'); });
             }
         }
 
@@ -691,6 +738,8 @@
                 if (b) bracketData = JSON.parse(b);
                 const t = localStorage.getItem('bey_top3');
                 if (t) top3Data = JSON.parse(t);
+                const visibility = localStorage.getItem('bey_public_settings');
+                if (visibility) { const v = JSON.parse(visibility); publicSettings = {c: v.c === true, d: v.d === true}; }
             } catch(e) { console.error(e); }
         }
 
@@ -747,6 +796,8 @@
         function clearAllPlayers() {
             if (!confirm('確定要清空所有選手名單嗎？')) return;
             players = [];
+            publicSettings = { c: false, d: false };
+            renderPublicSettings();
             assignedSeeds = [];
             bracketData = { rounds: [] };
             top3Data = { players: [], matches: [] };
@@ -1118,7 +1169,26 @@
         }
         function makeCRound(entrants, roundIndex) {
             let pool = shuffleCEntrants(entrants);
-            if (pool.length % 2) pool.push({player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+            if (pool.length % 2) {
+                // 已輪空選手由既有賽程推算，避免重新整理後遺失紀錄。
+                const previousByes = new Set();
+                for (const round of (bracketData.rounds || []).slice(0, roundIndex)) {
+                    for (const m of round) {
+                        if (isByePlayer(m.p1) !== isByePlayer(m.p2)) {
+                            const player = isByePlayer(m.p1) ? m.p2 : m.p1;
+                            previousByes.add(String(player.id));
+                        }
+                    }
+                }
+                // pool 已隨機排序，從尚未輪空的人中隨機選擇一位。
+                const eligibleIndex = pool.findIndex(x => !x.isBye && !previousByes.has(String(x.player.id)));
+                if (eligibleIndex < 0) {
+                    showToast('剩餘選手都已輪空過，無法安排不重複輪空');
+                    return null;
+                }
+                const [byePlayer] = pool.splice(eligibleIndex, 1);
+                pool.push(byePlayer, {player:{id:`BYE_R${roundIndex}`,name:'輪空 (BYE)'},seed:'-',isBye:true});
+            }
             // 避免輪空互打；正常情況每輪最多新增一個輪空。
             const matches = [];
             for (let i = 0; i < pool.length; i += 2) {
@@ -1151,6 +1221,19 @@
                     break;
                 }
                 const winners = current.map(m=>m.winner);
+                if (r === 0 && bracketData.revival?.enabled) {
+                    const signature = revivalSignature();
+                    if (bracketData.revival.signature && bracketData.revival.signature !== signature) {
+                        bracketData.revival.decision = null; bracketData.revival.signature = null;
+                        rounds.splice(1);
+                    }
+                    if (!bracketData.revival.decision) { rounds.splice(1); break; }
+                    if (bracketData.revival.decision !== 'none') {
+                        const loser = getFirstRoundLosers().find(p=>String(p.id) === String(bracketData.revival.decision));
+                        if (!loser) { bracketData.revival.decision = null; rounds.splice(1); break; }
+                        winners.push(loser);
+                    }
+                }
                 if (winners.length <= target) {
                     if (rounds.length > r+1) rounds.splice(r+1);
                     break;
@@ -1160,10 +1243,58 @@
                 const winnerIds = winners.map(p=>p.id).sort();
                 if (!existing || JSON.stringify(existingIds)!==JSON.stringify(winnerIds)) {
                     rounds.splice(r+1);
-                    rounds.push(makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1));
+                    if (r === 0 && bracketData.revival?.decision && bracketData.revival.decision !== 'none') {
+                        const byeMatch = current.find(m=>isByePlayer(m.p1) !== isByePlayer(m.p2));
+                        const revived = winners.find(p=>String(p.id) === String(bracketData.revival.decision));
+                        const byePlayer = byeMatch && (isByePlayer(byeMatch.p1) ? byeMatch.p2 : byeMatch.p1);
+                        if (byePlayer && revived) {
+                            const remaining = winners.filter(p=>p.id !== revived.id && p.id !== byePlayer.id);
+                            const forced = {p1:byePlayer,p2:revived,seed1:'-',seed2:'-',score1:0,score2:0,winner:null};
+                            const rest = makeCRound(remaining.map(p=>({player:p,seed:'-',isBye:false})),r+1);
+                            if (!rest) break;
+                            rounds.push([forced,...rest]);
+                        } else { const next = makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1); if (!next) break; rounds.push(next); }
+                    } else { const next = makeCRound(winners.map(p=>({player:p,seed:'-',isBye:false})),r+1); if (!next) break; rounds.push(next); }
                 }
             }
             saveAllToStorage(false);
+        }
+        function isByePlayer(p) { return !p || String(p.id).startsWith('BYE_'); }
+        function getFirstRoundLosers() {
+            return (bracketData.rounds?.[0] || []).filter(m=>m.winner && !isByePlayer(m.p1) && !isByePlayer(m.p2)).map(m=>m.winner.id === m.p1.id ? m.p2 : m.p1);
+        }
+        function revivalSignature() {
+            return JSON.stringify((bracketData.rounds?.[0] || []).map(m=>[m.p1?.id,m.p2?.id,m.winner?.id]));
+        }
+        function enableRevival() {
+            const first = bracketData.rounds?.[0];
+            if (!first?.length) { showToast('請先在 B 頁面抽籤'); return; }
+            const byes = first.filter(m=>isByePlayer(m.p1) !== isByePlayer(m.p2));
+            if (byes.length !== 1) { showToast('復活模式需要第一輪恰好有一位輪空選手'); return; }
+            if ((bracketData.rounds || []).slice(1).some(round=>round.some(m=>m.score1 || m.score2 || (m.winner && !isByePlayer(m.p1) && !isByePlayer(m.p2))))) { showToast('第二輪已有比賽紀錄，無法啟用復活模式'); return; }
+            if (!confirm('啟用後，第一輪結束時將等待復活決定；已產生但未開始的後續配對會重新抽籤。確定啟用？')) return;
+            bracketData.rounds.splice(1); bracketData.revival = {enabled:true,decision:null,signature:null};
+            saveAllToStorage(); renderBracketTree();
+        }
+        function renderRevivalUI() {
+            const status=document.getElementById('revivalStatus'), controls=document.getElementById('revivalControls'), enable=document.getElementById('revivalEnable'), select=document.getElementById('revivalPlayer');
+            if (!status) return;
+            const state=bracketData.revival, first=bracketData.rounds?.[0] || [];
+            enable.classList.toggle('hidden',!!state?.enabled); controls.classList.add('hidden');
+            if (!state?.enabled) { status.textContent='啟用後，第一輪結束會等待選擇復活選手或無人復活，再安排第二輪。請在第二輪開始前啟用。'; return; }
+            if (state.decision) { const player=getFirstRoundLosers().find(p=>String(p.id)===String(state.decision)); status.textContent=state.decision === 'none' ? '已選擇無人復活，第二輪正常隨機配對。' : `已復活：${player?.name || '選手'}，第二輪對上第一輪輪空選手。`; return; }
+            if (!first.length || !first.every(m=>m.winner && !isByePlayer(m.winner))) { status.textContent='復活模式已啟用，請先完成第一輪所有對戰。'; return; }
+            status.textContent='第一輪已結束，請選擇復活選手，或選擇無人復活。';
+            select.replaceChildren(); const placeholder=document.createElement('option'); placeholder.value=''; placeholder.textContent='請選擇第一輪落敗選手'; select.appendChild(placeholder);
+            getFirstRoundLosers().forEach(p=>{const opt=document.createElement('option'); opt.value=String(p.id); opt.textContent=p.name; select.appendChild(opt);}); controls.classList.remove('hidden');
+        }
+        function decideRevival(revive) {
+            const id=document.getElementById('revivalPlayer').value;
+            if (revive && !getFirstRoundLosers().some(p=>String(p.id)===id)) { showToast('請先選擇第一輪落敗選手'); return; }
+            const name=getFirstRoundLosers().find(p=>String(p.id)===id)?.name;
+            if (!confirm(revive ? `確定讓 ${name} 復活並安排第二輪？` : '確定無人復活並安排第二輪？')) return;
+            bracketData.revival.decision=revive ? id : 'none'; bracketData.revival.signature=revivalSignature();
+            propagateBracketWinners(); saveAllToStorage(); renderBracketTree(); showToast('已產生下一輪對戰');
         }
         function getPlayerPaymentTag(playerObj) {
             if (!playerObj || !playerObj.id || playerObj.name === 'TBD' || playerObj.name.includes('BYE')) return '';
@@ -1176,6 +1307,7 @@
         }
 
         function renderBracketTree() {
+            renderRevivalUI();
             const container = document.getElementById('bracketTreeContainer');
             if (!container) return;
             if (!bracketData.rounds || bracketData.rounds.length === 0) {
@@ -1702,50 +1834,89 @@
             showToast('已記錄勝場！');
         }
 
-        function executeNumberLottery() {
-            const minInput = parseInt(document.getElementById('lotteryMin').value);
-            const maxInput = parseInt(document.getElementById('lotteryMax').value);
+        // F 頁面號碼抽獎：紀錄保存在此裝置瀏覽器，重整頁面不會重複抽中。
+        let lotteryDrawnNumbers = [];
+        let lotteryDrawing = false;
+        try {
+            const storedLottery = JSON.parse(localStorage.getItem('bey_lottery_drawn_numbers') || '[]');
+            if (Array.isArray(storedLottery)) {
+                lotteryDrawnNumbers = [...new Set(storedLottery.filter(Number.isSafeInteger))];
+            }
+        } catch (e) { console.warn('無法讀取抽獎紀錄', e); }
 
-            if (isNaN(minInput) || isNaN(maxInput)) {
-                showToast('請填寫有效的最小與最大號碼！');
+        function renderLotteryHistory() {
+            document.getElementById('lotteryDrawCount').innerText = `已抽出 ${lotteryDrawnNumbers.length} 個號碼`;
+            document.getElementById('lotteryDrawHistory').innerText = lotteryDrawnNumbers.length
+                ? `已抽號碼：${lotteryDrawnNumbers.join('、')}` : '尚無抽獎紀錄';
+        }
+
+        function executeNumberLottery() {
+            if (lotteryDrawing) return;
+            const minInput = Number(document.getElementById('lotteryMin').value);
+            const maxInput = Number(document.getElementById('lotteryMax').value);
+            if (!Number.isSafeInteger(minInput) || !Number.isSafeInteger(maxInput) ||
+                !document.getElementById('lotteryMin').value.trim() ||
+                !document.getElementById('lotteryMax').value.trim()) {
+                showToast('請填寫有效的整數號碼！');
                 return;
             }
-
             if (minInput > maxInput) {
                 showToast('最小號碼不可大於最大號碼！');
                 return;
             }
-
+            const drawnInRange = new Set(lotteryDrawnNumbers.filter(n => n >= minInput && n <= maxInput));
+            const availableCount = maxInput - minInput + 1 - drawnInRange.size;
+            if (availableCount <= 0) {
+                document.getElementById('lotterySubText').innerText = '此區間的號碼已全部抽完，請重設或調整區間。';
+                showToast('此區間所有號碼都已抽完！');
+                return;
+            }
+            // 從剩餘號碼中等機率選一個，避免重複抽選。
+            let offset = Math.floor(Math.random() * availableCount);
+            let finalResult;
+            for (let n = minInput; n <= maxInput; n++) {
+                if (!drawnInRange.has(n) && offset-- === 0) { finalResult = n; break; }
+            }
+            lotteryDrawing = true;
+            const button = document.getElementById('lotteryDrawButton');
+            button.disabled = true;
+            button.classList.add('opacity-60');
             const display = document.getElementById('lotteryResultDisplay');
             const subText = document.getElementById('lotterySubText');
-            
             let counter = 0;
-            const totalSteps = 15;
             display.classList.add('scale-105', 'text-bey-accent');
-            
             const interval = setInterval(() => {
-                const randomTemp = Math.floor(Math.random() * (maxInput - minInput + 1)) + minInput;
-                display.innerText = randomTemp;
+                display.innerText = Math.floor(Math.random() * (maxInput - minInput + 1)) + minInput;
                 counter++;
-                
-                if (counter >= totalSteps) {
+                if (counter >= 15) {
                     clearInterval(interval);
-                    const finalResult = Math.floor(Math.random() * (maxInput - minInput + 1)) + minInput;
+                    lotteryDrawnNumbers.push(finalResult);
+                    localStorage.setItem('bey_lottery_drawn_numbers', JSON.stringify(lotteryDrawnNumbers));
                     display.innerText = finalResult;
                     display.classList.remove('scale-105', 'text-bey-accent');
-                    subText.innerText = `成功從 ${minInput} ~ ${maxInput} 之中隨機抽選！`;
+                    subText.innerText = `成功抽選！此區間剩餘 ${availableCount - 1} 個未抽號碼`;
+                    renderLotteryHistory();
+                    lotteryDrawing = false;
+                    button.disabled = false;
+                    button.classList.remove('opacity-60');
                     showToast(`🎉 恭喜抽中幸運號碼：【${finalResult}】！`);
                 }
             }, 60);
         }
 
         function resetLottery() {
+            if (lotteryDrawing) { showToast('請等待本次抽獎結束'); return; }
+            if (lotteryDrawnNumbers.length && !confirm('確定清除所有已抽號碼，重新開始抽獎嗎？')) return;
+            lotteryDrawnNumbers = [];
+            localStorage.removeItem('bey_lottery_drawn_numbers');
             document.getElementById('lotteryMin').value = '1';
             document.getElementById('lotteryMax').value = '100';
             document.getElementById('lotteryResultDisplay').innerText = '--';
             document.getElementById('lotterySubText').innerText = '請設定號碼區間並點擊下方按鈕開始抽獎';
-            showToast('已重設抽獎區間');
+            renderLotteryHistory();
+            showToast('已清除抽獎紀錄並重設區間');
         }
+        renderLotteryHistory();
     </script>
 </body>
 </html>
